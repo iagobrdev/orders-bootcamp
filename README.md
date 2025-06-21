@@ -190,30 +190,6 @@ docker-compose build orders-app
 docker-compose up -d
 ```
 
-### 🔧 Execução Local (Alternativo)
-
-Se preferir executar localmente:
-
-1. **Clone o repositório**
-```bash
-git clone <url-do-repositorio>
-cd orders
-```
-
-2. **Inicie apenas o banco de dados**
-```bash
-docker-compose up -d postgres
-```
-
-3. **Execute a aplicação localmente**
-```bash
-./mvnw spring-boot:run
-```
-
-4. **Acesse a documentação**
-- **Swagger UI**: http://localhost:8085/swagger-ui.html
-- **API Base URL**: http://localhost:8085/api
-
 ## 📖 Documentação da API
 
 ### Endpoints Principais
