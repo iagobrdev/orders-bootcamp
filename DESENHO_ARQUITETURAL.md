@@ -214,33 +214,37 @@ classDiagram
     direction TB
 
     package "Controller (View)" {
-        class ClienteController
-        class ProdutoController
-        class PedidoController
+        ClienteController
+        ProdutoController
+        PedidoController
     }
 
     package "Service (Controller Logic)" {
-        class IClienteService
-        class ClienteServiceImpl
-        class IProdutoService
-        class ProdutoServiceImpl
-        class IPedidoService
-        class PedidoServiceImpl
+        IClienteService
+        ClienteServiceImpl
+        IProdutoService
+        ProdutoServiceImpl
+        IPedidoService
+        PedidoServiceImpl
     }
 
     package "Repository (Data Access)" {
-        class ClienteRepository
-        class ProdutoRepository
-        class PedidoRepository
+        ClienteRepository
+        ProdutoRepository
+        PedidoRepository
     }
 
     package "Model (Domain)" {
-        class Cliente
-        class Produto
-        class Pedido
-        class ItemPedido
+        Cliente
+        Produto
+        Pedido
+        ItemPedido
     }
 
+    class IClienteService { <<Interface>> }
+    class IProdutoService { <<Interface>> }
+    class IPedidoService { <<Interface>> }
+    
     ClienteController ..> IClienteService
     ProdutoController ..> IProdutoService
     PedidoController ..> IPedidoService
