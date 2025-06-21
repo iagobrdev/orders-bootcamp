@@ -374,6 +374,10 @@ classDiagram
     
     class Pedido {
         -Long id
+        -Cliente cliente
+        -LocalDateTime dataPedido
+        -StatusPedido status
+        -TipoPagamento tipoPagamento
         -BigDecimal valorTotal
     }
     
