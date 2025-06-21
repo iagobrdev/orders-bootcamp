@@ -214,26 +214,32 @@ classDiagram
     direction TD
 
     %% Camada de Controller
-    ClienteController
-    ProdutoController
-    PedidoController
+    class ClienteController
+    class ProdutoController
+    class PedidoController
 
     %% Camada de Service (Interfaces e Implementações)
-    IClienteService { <<Interface>> }
-    ClienteServiceImpl
-    IProdutoService { <<Interface>> }
-    ProdutoServiceImpl
-    IPedidoService { <<Interface>> }
-    PedidoServiceImpl
+    class IClienteService
+    <<Interface>> IClienteService
+    class ClienteServiceImpl
+    class IProdutoService
+    <<Interface>> IProdutoService
+    class ProdutoServiceImpl
+    class IPedidoService
+    <<Interface>> IPedidoService
+    class PedidoServiceImpl
     
     %% Camada de Repository e Entidades
-    ClienteRepository { <<Interface>> }
-    ProdutoRepository { <<Interface>> }
-    PedidoRepository { <<Interface>> }
-    Cliente
-    Produto
-    Pedido
-    ItemPedido
+    class ClienteRepository
+    <<Interface>> ClienteRepository
+    class ProdutoRepository
+    <<Interface>> ProdutoRepository
+    class PedidoRepository
+    <<Interface>> PedidoRepository
+    class Cliente
+    class Produto
+    class Pedido
+    class ItemPedido
     
     %% --- Fluxo Principal ---
     ClienteController ..> IClienteService
