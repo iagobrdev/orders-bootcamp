@@ -207,61 +207,56 @@ graph TD
 ### C4 Model Nível 4: Classes e Sequência
 
 #### Diagrama de Classes
-Este diagrama mostra as principais classes que compõem a solução, seus relacionamentos e a separação entre as camadas MVC.
+Este diagrama mostra o fluxo de dependências da aplicação, seguindo a arquitetura MVC desde a camada de Controller até a persistência de dados.
 
 ```mermaid
 classDiagram
-    direction LR
+    direction TD
 
     %% Camada de Controller
-    class ClienteController
-    class ProdutoController
-    class PedidoController
+    ClienteController
+    ProdutoController
+    PedidoController
 
-    %% Camada de Service - Interfaces
-    class IClienteService { <<Interface>> }
-    class IProdutoService { <<Interface>> }
-    class IPedidoService { <<Interface>> }
-
-    %% Camada de Service - Implementações
-    class ClienteServiceImpl
-    class ProdutoServiceImpl
-    class PedidoServiceImpl
-
-    %% Camada de Repository - Interfaces
-    class ClienteRepository { <<Interface>> }
-    class ProdutoRepository { <<Interface>> }
-    class PedidoRepository { <<Interface>> }
-
-    %% Camada de Model - Entidades
-    class Cliente
-    class Produto
-    class Pedido
-    class ItemPedido
-
-    %% Relacionamentos Controller -> Service
+    %% Camada de Service (Interfaces e Implementações)
+    IClienteService { <<Interface>> }
+    ClienteServiceImpl
+    IProdutoService { <<Interface>> }
+    ProdutoServiceImpl
+    IPedidoService { <<Interface>> }
+    PedidoServiceImpl
+    
+    %% Camada de Repository e Entidades
+    ClienteRepository { <<Interface>> }
+    ProdutoRepository { <<Interface>> }
+    PedidoRepository { <<Interface>> }
+    Cliente
+    Produto
+    Pedido
+    ItemPedido
+    
+    %% --- Fluxo Principal ---
     ClienteController ..> IClienteService
-    ProdutoController ..> IProdutoService
-    PedidoController ..> IPedidoService
-
-    %% Relacionamentos Service Impl -> Service Interface
     ClienteServiceImpl ..|> IClienteService
-    ProdutoServiceImpl ..|> IProdutoService
-    PedidoServiceImpl ..|> IPedidoService
-
-    %% Relacionamentos Service Impl -> Repository
     ClienteServiceImpl ..> ClienteRepository
+    ClienteRepository --o Cliente
+
+    ProdutoController ..> IProdutoService
+    ProdutoServiceImpl ..|> IProdutoService
     ProdutoServiceImpl ..> ProdutoRepository
+    ProdutoRepository --o Produto
+
+    PedidoController ..> IPedidoService
+    PedidoServiceImpl ..|> IPedidoService
     PedidoServiceImpl ..> PedidoRepository
+    PedidoRepository --o Pedido
+    
+    %% --- Dependências Cruzadas e Relacionamentos de Entidades ---
+    PedidoServiceImpl ..> ClienteRepository : usa
+    PedidoServiceImpl ..> ProdutoRepository : usa
 
-    %% Relacionamentos Repository -> Model
-    ClienteRepository o-- Cliente
-    ProdutoRepository o-- Produto
-    PedidoRepository o-- Pedido
-
-    %% Relacionamentos entre Entidades
-    Cliente "1" -- "0..*" Pedido : faz
     Pedido "1" -- "1..*" ItemPedido : contém
+    Cliente "1" -- "0..*" Pedido : faz
     Produto "1" -- "0..*" ItemPedido : compõe
 ```
 
