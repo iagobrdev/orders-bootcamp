@@ -204,86 +204,84 @@ graph TD
     component_pedidos -- "Usa" --> container_db
 ```
 
-### C4 Model Nível 4: Classes e Sequência
+### C4 Model Nível 4: Pacotes, Classes e Sequência
 
-#### Diagrama de Classes
-Este diagrama mostra o fluxo de dependências da aplicação, seguindo a arquitetura MVC desde a camada de Controller até a persistência de dados.
+#### Diagrama de Pacotes
+Este diagrama mostra a organização dos pacotes da aplicação, refletindo a arquitetura em camadas do projeto.
+
+```mermaid
+graph TD
+    subgraph "Estrutura do Projeto (src/main/java/com/br/bootcamp/orders)"
+        direction LR
+        controller["controller"]
+        service["service"]
+        repository["repository"]
+        model["model"]
+    end
+```
+
+#### Diagrama de Classes (Exemplo: Domínio Produto)
+Este diagrama detalha as classes do domínio "Produto" como um exemplo representativo da arquitetura.
 
 ```mermaid
 classDiagram
-    direction TD
+    direction LR
 
-    %% Camada de Controller
-    class ClienteController
-    class ProdutoController
-    class PedidoController
+    class ProdutoController {
+        -IProdutoService produtoService
+        +listarTodos() : ResponseEntity
+        +buscarPorId(id) : ResponseEntity
+        +criar(dto) : ResponseEntity
+    }
 
-    %% Camada de Service (Interfaces e Implementações)
-    class IClienteService
-    <<Interface>> IClienteService
-    class ClienteServiceImpl
-    class IProdutoService
-    <<Interface>> IProdutoService
-    class ProdutoServiceImpl
-    class IPedidoService
-    <<Interface>> IPedidoService
-    class PedidoServiceImpl
-    
-    %% Camada de Repository e Entidades
-    class ClienteRepository
-    <<Interface>> ClienteRepository
-    class ProdutoRepository
-    <<Interface>> ProdutoRepository
-    class PedidoRepository
-    <<Interface>> PedidoRepository
-    class Cliente
-    class Produto
-    class Pedido
-    class ItemPedido
-    
-    %% --- Fluxo Principal ---
-    ClienteController ..> IClienteService
-    ClienteServiceImpl ..|> IClienteService
-    ClienteServiceImpl ..> ClienteRepository
-    ClienteRepository --o Cliente
+    class IProdutoService {
+        <<Interface>>
+        +listarTodos() : List~Produto~
+        +buscarPorId(id) : Optional~Produto~
+        +salvar(dto) : Produto
+    }
+
+    class ProdutoServiceImpl {
+        -ProdutoRepository produtoRepository
+    }
+
+    class ProdutoRepository {
+        <<Interface>>
+        +findByNomeContainingIgnoreCase(nome) : List~Produto~
+    }
+
+    class Produto {
+        -Long id
+        -String nome
+        -String descricao
+        -BigDecimal preco
+        -Integer quantidadeEstoque
+        -CategoriaProduto categoria
+    }
 
     ProdutoController ..> IProdutoService
     ProdutoServiceImpl ..|> IProdutoService
     ProdutoServiceImpl ..> ProdutoRepository
-    ProdutoRepository --o Produto
-
-    PedidoController ..> IPedidoService
-    PedidoServiceImpl ..|> IPedidoService
-    PedidoServiceImpl ..> PedidoRepository
-    PedidoRepository --o Pedido
-    
-    %% --- Dependências Cruzadas e Relacionamentos de Entidades ---
-    PedidoServiceImpl ..> ClienteRepository : usa
-    PedidoServiceImpl ..> ProdutoRepository : usa
-
-    Pedido "1" -- "1..*" ItemPedido : contém
-    Cliente "1" -- "0..*" Pedido : faz
-    Produto "1" -- "0..*" ItemPedido : compõe
+    ProdutoRepository "1" -- "0..*" Produto
 ```
 
-#### Diagrama de Sequência Genérico: Criação de um Registro
-Este diagrama ilustra um fluxo genérico para a criação de um novo registro no sistema.
+#### Diagrama de Sequência (Exemplo: Listar Produtos)
+Este diagrama ilustra a sequência de chamadas para a listagem de todos os produtos.
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Controller
-    participant Service
-    participant Repository
-    participant Database
+    participant Controller as ProdutoController
+    participant Service as IProdutoService
+    participant Repository as ProdutoRepository
+    participant DB as Database
 
-    User->>Controller: Requisição POST com dados (DTO)
-    Controller->>Service: salvar(dto)
-    Service->>Service: Validações de Negócio
-    Service->>Repository: save(entity)
-    Repository->>Database: INSERT na tabela correspondente
-    Database-->>Repository: Retorna registro com ID
-    Repository-->>Service: Retorna entidade salva
-    Service-->>Controller: Retorna entidade salva
-    Controller-->>User: Resposta 201 Created com JSON
+    User->>Controller: GET /api/produtos
+    Controller->>Service: listarTodos()
+    Service->>Repository: findAll()
+    Repository->>DB: SELECT * FROM produtos
+    DB-->>Repository: Retorna lista de produtos
+    Repository-->>Service: Retorna List<Produto>
+    Service-->>Controller: Retorna List<Produto>
+    Controller-->>User: Resposta 200 OK com JSON
 ```
