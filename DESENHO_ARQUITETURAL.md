@@ -220,7 +220,7 @@ graph TD
     end
 ```
 
-#### Diagrama de Classes (Exemplo: Domínio Produto)
+#### Diagrama de Classes (Domínio Produto)
 Este diagrama detalha as classes do domínio "Produto" como um exemplo representativo da arquitetura.
 
 ```mermaid
@@ -272,7 +272,7 @@ classDiagram
     ProdutoRepository "1" -- "0..*" Produto
 ```
 
-#### Diagrama de Classes (Exemplo: Domínio Cliente)
+#### Diagrama de Classes (Domínio Cliente)
 Este diagrama detalha as classes e o fluxo de dependências do domínio "Cliente".
 
 ```mermaid
@@ -322,7 +322,7 @@ classDiagram
     ClienteRepository "1" -- "0..*" Cliente
 ```
 
-#### Diagrama de Classes (Exemplo: Domínio Pedido)
+#### Diagrama de Classes (Domínio Pedido)
 Este diagrama detalha as classes do domínio "Pedido" e suas dependências com outros domínios.
 
 ```mermaid
@@ -402,25 +402,3 @@ classDiagram
     Pedido "1" *-- "N" ItemPedido
     Cliente "1" -- "0..*" Pedido
     Produto "1" -- "0..*" ItemPedido
-```
-
-#### Diagrama de Sequência (Exemplo: Listar Produtos)
-Este diagrama ilustra a sequência de chamadas para a listagem de todos os produtos.
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Controller as ProdutoController
-    participant Service as IProdutoService
-    participant Repository as ProdutoRepository
-    participant DB as Database
-
-    User->>Controller: GET /api/produtos
-    Controller->>Service: listarTodos()
-    Service->>Repository: findAll()
-    Repository->>DB: SELECT * FROM produtos
-    DB-->>Repository: Retorna lista de produtos
-    Repository-->>Service: Retorna List<Produto>
-    Service-->>Controller: Retorna List<Produto>
-    Controller-->>User: Resposta 200 OK com JSON
-```
