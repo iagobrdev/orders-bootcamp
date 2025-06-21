@@ -224,9 +224,9 @@ graph TD
     pc -- "Usa" --> ips
     oc -- "Usa" --> ios
     
-    cs -- "Implementa" --> ics
-    ps -- "Implementa" --> ips
-    os -- "Implementa" --> ios
+    ics -- "É implementada por" --> cs
+    ips -- "É implementada por" --> ps
+    ios -- "É implementada por" --> os
 
     cs -- "Acessa" --> db
     ps -- "Acessa" --> db
