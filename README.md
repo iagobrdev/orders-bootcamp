@@ -148,11 +148,9 @@ src/main/java/com/br/bootcamp/orders/
 ## 🔧 Configuração e Execução
 
 ### Pré-requisitos
-- Java 21 ou superior
 - Docker e Docker Compose
-- Maven 3.6+
 
-### Passo a Passo
+### 🐳 Execução com Docker (Recomendado)
 
 1. **Clone o repositório**
 ```bash
@@ -160,12 +158,54 @@ git clone <url-do-repositorio>
 cd orders
 ```
 
-2. **Inicie o banco de dados**
+2. **Execute todos os serviços (aplicação + banco)**
 ```bash
 docker-compose up -d
 ```
 
-3. **Execute a aplicação**
+3. **Acesse a aplicação**
+- **Swagger UI**: http://localhost:8085/swagger-ui.html
+- **API Base URL**: http://localhost:8085/api
+
+### 📋 Comandos úteis do Docker
+
+```bash
+# Verificar status dos serviços
+docker-compose ps
+
+# Ver logs da aplicação
+docker-compose logs -f orders-app
+
+# Ver logs do banco de dados
+docker-compose logs -f postgres
+
+# Parar todos os serviços
+docker-compose down
+
+# Parar e remover volumes (dados do banco)
+docker-compose down -v
+
+# Rebuild da aplicação
+docker-compose build orders-app
+docker-compose up -d
+```
+
+### 🔧 Execução Local (Alternativo)
+
+Se preferir executar localmente:
+
+1. **Clone o repositório**
+```bash
+git clone <url-do-repositorio>
+cd orders
+```
+
+2. **Inicie apenas o banco de dados**
+```bash
+docker-compose up -d postgres
+```
+
+3. **Execute a aplicação localmente**
 ```bash
 ./mvnw spring-boot:run
 ```

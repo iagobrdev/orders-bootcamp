@@ -1,0 +1,8 @@
+target/
+.git/
+.gitignore
+README.md
+DESENHO_ARQUITETURAL.md
+docker-compose.yml
+Dockerfile
+.dockerignore 
