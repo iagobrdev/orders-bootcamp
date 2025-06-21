@@ -135,7 +135,7 @@ public class PedidoServiceImpl implements IPedidoService {
 
         } catch (RuntimeException e) {
             log.error("Erro ao criar o pedido: {}", e.getMessage(), e);
-            throw new BusinessException("Erro ao processar o pedido. Verifique os dados fornecidos.");
+            throw new BusinessException(e.getMessage());
         }
     }
     

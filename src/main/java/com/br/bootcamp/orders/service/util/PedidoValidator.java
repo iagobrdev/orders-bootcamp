@@ -75,17 +75,7 @@ public class PedidoValidator {
      * @throws RuntimeException se o item for inválido
      */
     private void validarItem(ItemPedido item) {
-        validarProdutoDoItem(item);
-        validarQuantidadeDoItem(item);
-    }
-    
-    /**
-     * Valida se o produto do item existe.
-     * 
-     * @param item Item a ser validado
-     * @throws RuntimeException se o produto não existir
-     */
-    private void validarProdutoDoItem(ItemPedido item) {
+        // Valida se o produto existe e obtém a referência
         if (item.getProduto() == null || item.getProduto().getId() == null) {
             throw new RuntimeException("Produto é obrigatório para cada item do pedido");
         }
@@ -94,18 +84,10 @@ public class PedidoValidator {
         if (produtoOpt.isEmpty()) {
             throw new RuntimeException("Produto não encontrado com ID: " + item.getProduto().getId());
         }
-    }
-    
-    /**
-     * Valida se a quantidade do item está disponível em estoque.
-     * 
-     * @param item Item a ser validado
-     * @throws RuntimeException se o estoque for insuficiente
-     */
-    private void validarQuantidadeDoItem(ItemPedido item) {
-        Optional<Produto> produtoOpt = produtoService.buscarPorId(item.getProduto().getId());
+        
         Produto produto = produtoOpt.get();
         
+        // Valida a quantidade usando o produto já obtido
         if (produto.getQuantidadeEstoque() < item.getQuantidade()) {
             throw new RuntimeException("Estoque insuficiente para o produto: " + produto.getNome());
         }
