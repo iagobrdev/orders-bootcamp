@@ -187,23 +187,39 @@ graph TD
 
 ### C4 Model Nível 3: Diagrama de Componentes
 
-Este diagrama detalha os principais componentes que formam a API REST, ilustrando a separação de responsabilidades da arquitetura MVC. As requisições são recebidas pela camada de `Controller`, que orquestra a execução da lógica de negócio na camada de `Service`. A camada de `Service` então interage com o banco de dados.
+Este diagrama detalha os principais componentes que formam a API REST, ilustrando a arquitetura em camadas e o fluxo de uma requisição. A API recebe a chamada e a direciona para o `Controller` apropriado. O `Controller` utiliza o `Service` correspondente para executar a lógica de negócio, que por sua vez, interage com o banco de dados para persistir ou consultar dados.
 
 ```mermaid
 graph TD
-    container_api("API REST<br>[Container]")
+    direction TB
     
-    subgraph "Componentes da API"
-        direction TB
-        c("Controllers<br>[Componente]<br>Recebem requisições HTTP e<br>orquestram as operações.")
-        s("Services<br>[Componente]<br>Contêm a lógica de negócio,<br>validações e regras.")
+    api("API REST<br>[Container]")
+
+    subgraph "Camada de Controladores (Controllers)"
+        direction LR
+        cc("ClienteController<br>[Componente]")
+        pc("ProdutoController<br>[Componente]")
+        oc("PedidoController<br>[Componente]")
     end
-    
+
+    subgraph "Camada de Serviços (Services)"
+        direction LR
+        cs("ClienteService<br>[Componente]")
+        ps("ProdutoService<br>[Componente]")
+        os("PedidoService<br>[Componente]")
+    end
+
     db("Banco de Dados<br>[Container: PostgreSQL]")
 
-    container_api -- "Encaminha para" --> c
-    c -- "Chama" --> s
-    s -- "Lê e Escreve em<br>[JDBC]" --> db
+    api --> cc & pc & oc
+
+    cc -- "Usa" --> cs
+    pc -- "Usa" --> ps
+    oc -- "Usa" --> os
+
+    cs -- "Acessa" --> db
+    ps -- "Acessa" --> db
+    os -- "Acessa" --> db
 ```
 
 ### C4 Model Nível 4: Pacotes, Classes e Sequência
