@@ -197,9 +197,9 @@ graph TD
 
     subgraph "Camada de Controllers"
         direction LR
-        cc("ClienteController<br>[Componente]")
-        pc("ProdutoController<br>[Componente]")
-        oc("PedidoController<br>[Componente]")
+        cc("ClienteController<br>[Controller]")
+        pc("ProdutoController<br>[Controller]")
+        oc("PedidoController<br>[Controller]")
     end
 
     subgraph "Camada de Interfaces"
