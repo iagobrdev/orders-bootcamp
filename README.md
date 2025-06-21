@@ -164,7 +164,7 @@ docker-compose up -d
 ```
 
 3. **Acesse a aplicação**
-- **Swagger UI**: http://localhost:8085/swagger-ui.html
+- **Swagger UI**: http://localhost:8085/swagger-ui/index.html
 - **API Base URL**: http://localhost:8085/api
 
 ### 📋 Comandos úteis do Docker
