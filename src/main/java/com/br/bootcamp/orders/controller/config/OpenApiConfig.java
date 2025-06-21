@@ -23,7 +23,6 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Bootcamp Architecture Software")
-                                .email("contato@bootcamp.com")
                                 .url("https://github.com/iagobrdev/orders-bootcamp"))
                         .license(new License()
                                 .name("MIT License")
@@ -31,10 +30,7 @@ public class OpenApiConfig {
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:8085")
-                                .description("Servidor de Desenvolvimento"),
-                        new Server()
-                                .url("https://api.orders.com")
-                                .description("Servidor de Produção")
+                                .description("Servidor de Desenvolvimento")
                 ));
     }
 } 
