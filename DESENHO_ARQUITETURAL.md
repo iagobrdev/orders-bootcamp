@@ -211,63 +211,57 @@ Este diagrama mostra as principais classes que compõem a solução, seus relaci
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
 
-    %% Camada de Controller (View)
+    %% Camada de Controller
     class ClienteController
     class ProdutoController
     class PedidoController
 
-    %% Camada de Service (Controller Logic)
-    class IClienteService {
-        <<Interface>>
-    }
+    %% Camada de Service - Interfaces
+    class IClienteService { <<Interface>> }
+    class IProdutoService { <<Interface>> }
+    class IPedidoService { <<Interface>> }
+
+    %% Camada de Service - Implementações
     class ClienteServiceImpl
-    class IProdutoService {
-        <<Interface>>
-    }
     class ProdutoServiceImpl
-    class IPedidoService {
-        <<Interface>>
-    }
     class PedidoServiceImpl
 
-    %% Camada de Repository (Data Access)
-    class ClienteRepository {
-        <<Interface>>
-    }
-    class ProdutoRepository {
-        <<Interface>>
-    }
-    class PedidoRepository {
-        <<Interface>>
-    }
+    %% Camada de Repository - Interfaces
+    class ClienteRepository { <<Interface>> }
+    class ProdutoRepository { <<Interface>> }
+    class PedidoRepository { <<Interface>> }
 
-    %% Camada de Model (Domain)
+    %% Camada de Model - Entidades
     class Cliente
     class Produto
     class Pedido
     class ItemPedido
-    
-    %% Relacionamentos
+
+    %% Relacionamentos Controller -> Service
     ClienteController ..> IClienteService
     ProdutoController ..> IProdutoService
     PedidoController ..> IPedidoService
 
+    %% Relacionamentos Service Impl -> Service Interface
     ClienteServiceImpl ..|> IClienteService
     ProdutoServiceImpl ..|> IProdutoService
     PedidoServiceImpl ..|> IPedidoService
 
+    %% Relacionamentos Service Impl -> Repository
     ClienteServiceImpl ..> ClienteRepository
     ProdutoServiceImpl ..> ProdutoRepository
     PedidoServiceImpl ..> PedidoRepository
 
-    ClienteRepository --o Cliente
-    ProdutoRepository --o Produto
-    PedidoRepository --o Pedido
+    %% Relacionamentos Repository -> Model
+    ClienteRepository o-- Cliente
+    ProdutoRepository o-- Produto
+    PedidoRepository o-- Pedido
 
-    Pedido "1" -- "1..*" ItemPedido : contém
+    %% Relacionamentos entre Entidades
     Cliente "1" -- "0..*" Pedido : faz
+    Pedido "1" -- "1..*" ItemPedido : contém
     Produto "1" -- "0..*" ItemPedido : compõe
 ```
 
