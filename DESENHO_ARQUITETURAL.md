@@ -333,13 +333,27 @@ classDiagram
         -IPedidoService pedidoService
         +listarTodos() : ResponseEntity
         +buscarPorId(id) : ResponseEntity
+        +buscarPorCliente(clienteId) : ResponseEntity
+        +buscarPorStatus(status) : ResponseEntity
+        +buscarPorPeriodo(dataInicio, dataFim) : ResponseEntity
+        +contarPedidos() : ResponseEntity
         +criar(dto) : ResponseEntity
+        +atualizar(id, dto) : ResponseEntity
+        +atualizarStatus(id, novoStatus) : ResponseEntity
+        +deletar(id) : ResponseEntity
     }
 
     class IPedidoService {
         +listarTodos() : List~Pedido~
         +buscarPorId(id) : Optional~Pedido~
+        +buscarPorCliente(clienteId) : List~Pedido~
+        +buscarPorStatus(status) : List~Pedido~
+        +buscarPorPeriodo(dataInicio, dataFim) : List~Pedido~
+        +contarPedidos() : long
         +salvar(dto) : Pedido
+        +atualizar(id, dto) : Pedido
+        +atualizarStatus(id, novoStatus) : Pedido
+        +deletar(id) : void
     }
     <<Interface>> IPedidoService
 
