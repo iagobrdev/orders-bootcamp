@@ -231,14 +231,22 @@ classDiagram
         -IProdutoService produtoService
         +listarTodos() : ResponseEntity
         +buscarPorId(id) : ResponseEntity
+        +buscarPorNome(nome) : ResponseEntity
+        +contarProdutos() : ResponseEntity
         +criar(dto) : ResponseEntity
+        +atualizar(id, dto) : ResponseEntity
+        +deletar(id) : ResponseEntity
     }
 
     class IProdutoService {
         <<Interface>>
         +listarTodos() : List~Produto~
         +buscarPorId(id) : Optional~Produto~
+        +buscarPorNome(nome) : List~Produto~
+        +contarProdutos() : long
         +salvar(dto) : Produto
+        +atualizar(id, dto) : Produto
+        +deletar(id) : void
     }
 
     class ProdutoServiceImpl {
@@ -256,13 +264,117 @@ classDiagram
         -String descricao
         -BigDecimal preco
         -Integer quantidadeEstoque
-        -CategoriaProduto categoria
     }
 
     ProdutoController ..> IProdutoService
     ProdutoServiceImpl ..|> IProdutoService
     ProdutoServiceImpl ..> ProdutoRepository
     ProdutoRepository "1" -- "0..*" Produto
+```
+
+#### Diagrama de Classes (Exemplo: Domínio Cliente)
+Este diagrama detalha as classes e o fluxo de dependências do domínio "Cliente".
+
+```mermaid
+classDiagram
+    direction LR
+
+    class ClienteController {
+        -IClienteService clienteService
+        +listarTodos() : ResponseEntity
+        +buscarPorId(id) : ResponseEntity
+        +buscarPorNome(nome) : ResponseEntity
+        +criar(dto) : ResponseEntity
+        +atualizar(id, dto) : ResponseEntity
+        +deletar(id) : ResponseEntity
+    }
+
+    class IClienteService {
+        <<Interface>>
+        +listarTodos() : List~Cliente~
+        +buscarPorId(id) : Optional~Cliente~
+        +buscarPorNome(nome) : List~Cliente~
+        +salvar(dto) : Cliente
+        +atualizar(id, dto) : Cliente
+        +deletar(id) : void
+    }
+
+    class ClienteServiceImpl {
+        -ClienteRepository clienteRepository
+    }
+
+    class ClienteRepository {
+        <<Interface>>
+        +findByNomeContainingIgnoreCase(nome) : List~Cliente~
+        +findByEmail(email) : Optional~Cliente~
+    }
+
+    class Cliente {
+        -Long id
+        -String nome
+        -String email
+        -String telefone
+    }
+
+    ClienteController ..> IClienteService
+    ClienteServiceImpl ..|> IClienteService
+    ClienteServiceImpl ..> ClienteRepository
+    ClienteRepository "1" -- "0..*" Cliente
+```
+
+#### Diagrama de Classes (Exemplo: Domínio Pedido)
+Este diagrama detalha as classes do domínio "Pedido" e suas dependências com outros domínios.
+
+```mermaid
+classDiagram
+    direction LR
+    
+    class PedidoController {
+        -IPedidoService pedidoService
+        +listarTodos() : ResponseEntity
+        +buscarPorId(id) : ResponseEntity
+        +criar(dto) : ResponseEntity
+    }
+
+    class IPedidoService {
+        <<Interface>>
+        +listarTodos() : List~Pedido~
+        +buscarPorId(id) : Optional~Pedido~
+        +salvar(dto) : Pedido
+    }
+
+    class PedidoServiceImpl {
+        -PedidoRepository pedidoRepository
+        -ClienteRepository clienteRepository
+        -ProdutoRepository produtoRepository
+    }
+    
+    class PedidoRepository {
+        <<Interface>>
+    }
+    
+    class Pedido {
+        -Long id
+        -BigDecimal valorTotal
+    }
+    
+    class ItemPedido {
+        -Integer quantidade
+    }
+
+    class Cliente {}
+    class Produto {}
+
+    PedidoController ..> IPedidoService
+    PedidoServiceImpl ..|> IPedidoService
+    PedidoServiceImpl ..> PedidoRepository
+    PedidoServiceImpl ..> ClienteRepository
+    PedidoServiceImpl ..> ProdutoRepository
+    
+    PedidoRepository --o Pedido
+    Pedido "1" -- "1..*" ItemPedido
+    Cliente "1" -- "0..*" Pedido
+    Produto "1" -- "0..*" ItemPedido
 ```
 
 #### Diagrama de Sequência (Exemplo: Listar Produtos)
