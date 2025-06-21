@@ -213,38 +213,43 @@ Este diagrama mostra as principais classes que compõem a solução, seus relaci
 classDiagram
     direction TB
 
-    package "Controller (View)" {
-        ClienteController
-        ProdutoController
-        PedidoController
+    %% Camada de Controller (View)
+    class ClienteController
+    class ProdutoController
+    class PedidoController
+
+    %% Camada de Service (Controller Logic)
+    class IClienteService {
+        <<Interface>>
+    }
+    class ClienteServiceImpl
+    class IProdutoService {
+        <<Interface>>
+    }
+    class ProdutoServiceImpl
+    class IPedidoService {
+        <<Interface>>
+    }
+    class PedidoServiceImpl
+
+    %% Camada de Repository (Data Access)
+    class ClienteRepository {
+        <<Interface>>
+    }
+    class ProdutoRepository {
+        <<Interface>>
+    }
+    class PedidoRepository {
+        <<Interface>>
     }
 
-    package "Service (Controller Logic)" {
-        IClienteService
-        ClienteServiceImpl
-        IProdutoService
-        ProdutoServiceImpl
-        IPedidoService
-        PedidoServiceImpl
-    }
-
-    package "Repository (Data Access)" {
-        ClienteRepository
-        ProdutoRepository
-        PedidoRepository
-    }
-
-    package "Model (Domain)" {
-        Cliente
-        Produto
-        Pedido
-        ItemPedido
-    }
-
-    class IClienteService { <<Interface>> }
-    class IProdutoService { <<Interface>> }
-    class IPedidoService { <<Interface>> }
+    %% Camada de Model (Domain)
+    class Cliente
+    class Produto
+    class Pedido
+    class ItemPedido
     
+    %% Relacionamentos
     ClienteController ..> IClienteService
     ProdutoController ..> IProdutoService
     PedidoController ..> IPedidoService
