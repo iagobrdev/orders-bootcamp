@@ -20,8 +20,6 @@ O Elemento "Cliente" deverá possuir as seguintes características, representand
 | `telefone` | String       | Representando o telefone de contato do cliente.   |
 | `endereco` | String       | Representando o endereço do cliente.              |
 
-*Outros elementos como **Produto** e **Pedido** também possuem características próprias e endpoints dedicados.*
-
 ---
 
 ### O Elemento "Produto"
@@ -53,51 +51,57 @@ O Elemento "Cliente" deverá possuir as seguintes características, representand
 
 ### API
 
-A API deverá ser do tipo **RESTful** e deverá conter os seguintes métodos públicos expostos para o domínio **Cliente**:
+A API deverá ser do tipo **RESTful** e deverá conter os seguintes métodos públicos expostos.
 
--   **Path**: `/api/clientes`
-
+#### Endpoints de Clientes (`/api/clientes`)
 -   **`listarTodos()`** = Lista todos os Clientes cadastrados
     -   verbo **GET** (`/`)
-
 -   **`buscarPorNome(nome)`** = Lista os Clientes com similaridade de nome
     -   verbo **GET** (`/nome/{nome}`)
-
 -   **`buscarPorId(id)`** = Retorna 1 Cliente com o ID indicado
     -   verbo **GET** (`/{id}`)
-
 -   **`criar(clienteDTO)`** = Insere um novo cliente
     -   verbo **POST** (`/`)
-
 -   **`atualizar(id, clienteDTO)`** = Atualiza um cliente existente
     -   verbo **PUT** (`/{id}`)
-
 -   **`deletar(id)`** = Exclui um registro com o ID informado
     -   verbo **DELETE** (`/{id}`)
-
 -   **`contarClientes()`** = Retorna a quantidade de registros cadastrados
     -   verbo **GET** (`/contar`)
 
-A API também expõe endpoints para o domínio "Produto" e "Pedido":
-
 #### Endpoints de Produtos (`/api/produtos`)
--   **`GET /`**: Lista todos os Produtos.
--   **`GET /{id}`**: Retorna um Produto pelo ID.
--   **`GET /nome/{nome}`**: Lista Produtos por nome.
--   **`GET /contar`**: Retorna a quantidade de Produtos.
--   **`POST /`**: Insere um novo Produto.
--   **`PUT /{id}`**: Atualiza um Produto existente.
--   **`DELETE /{id}`**: Exclui um Produto.
+-   **`listarTodos()`** = Lista todos os Produtos cadastrados
+    -   verbo **GET** (`/`)
+-   **`buscarPorId(id)`** = Retorna 1 Produto com o ID indicado
+    -   verbo **GET** (`/{id}`)
+-   **`buscarPorNome(nome)`** = Lista os Produtos com similaridade de nome
+    -   verbo **GET** (`/nome/{nome}`)
+-   **`criar(produtoDTO)`** = Insere um novo produto
+    -   verbo **POST** (`/`)
+-   **`atualizar(id, produtoDTO)`** = Atualiza um produto existente
+    -   verbo **PUT** (`/{id}`)
+-   **`deletar(id)`** = Exclui um registro com o ID informado
+    -   verbo **DELETE** (`/{id}`)
+-   **`contarProdutos()`** = Retorna a quantidade de registros cadastrados
+    -   verbo **GET** (`/contar`)
 
 #### Endpoints de Pedidos (`/api/pedidos`)
--   **`GET /`**: Lista todos os Pedidos.
--   **`GET /{id}`**: Retorna um Pedido pelo ID.
--   **`GET /cliente/{id}`**: Lista Pedidos de um cliente específico.
--   **`GET /status/{status}`**: Lista Pedidos por status.
--   **`GET /contar`**: Retorna a quantidade de Pedidos.
--   **`POST /`**: Insere um novo Pedido.
--   **`PUT /{id}`**: Atualiza um Pedido existente.
--   **`DELETE /{id}`**: Exclui um Pedido.
+-   **`listarTodos()`** = Lista todos os Pedidos cadastrados
+    -   verbo **GET** (`/`)
+-   **`buscarPorId(id)`** = Retorna 1 Pedido com o ID indicado
+    -   verbo **GET** (`/{id}`)
+-   **`buscarPorCliente(id)`** = Lista os Pedidos de um cliente específico
+    -   verbo **GET** (`/cliente/{id}`)
+-   **`buscarPorStatus(status)`** = Lista os Pedidos por status
+    -   verbo **GET** (`/status/{status}`)
+-   **`criar(pedidoDTO)`** = Insere um novo pedido
+    -   verbo **POST** (`/`)
+-   **`atualizar(id, pedidoDTO)`** = Atualiza um pedido existente
+    -   verbo **PUT** (`/{id}`)
+-   **`deletar(id)`** = Exclui um registro com o ID informado
+    -   verbo **DELETE** (`/{id}`)
+-   **`contarPedidos()`** = Retorna a quantidade de registros cadastrados
+    -   verbo **GET** (`/contar`)
 
 ---
 
@@ -218,95 +222,78 @@ graph TD
     component_repository -- "Lê e escreve em" --> container_db
 ```
 
-### C4 Model Nível 4: Diagrama de Classes (Domínio Cliente)
+### C4 Model Nível 4: Diagrama de Classes
 
-Este diagrama mostra as principais classes envolvidas no domínio "Cliente" e seus relacionamentos.
+Este diagrama mostra as principais classes que compõem a solução, seus relacionamentos e a separação entre as camadas MVC.
 
 ```mermaid
 classDiagram
-    class ClienteController {
-        -IClienteService clienteService
-        +ResponseEntity~List~Cliente~~ listarTodos()
-        +ResponseEntity~Cliente~ buscarPorId(Long id)
-        +ResponseEntity~List~Cliente~~ buscarPorNome(String nome)
-        +ResponseEntity~Cliente~ criar(ClienteDTO dto)
-        +ResponseEntity~Cliente~ atualizar(Long id, ClienteDTO dto)
-        +ResponseEntity~Void~ deletar(Long id)
-        +ResponseEntity~Long~ contarClientes()
-    }
+    direction TB
 
-    class IClienteService {
-        <<Interface>>
-        +List~Cliente~ listarTodos()
-        +Optional~Cliente~ buscarPorId(Long id)
-        +List~Cliente~ buscarPorNome(String nome)
-        +Cliente salvar(ClienteDTO dto)
-        +Cliente atualizar(Long id, ClienteDTO dto)
-        +void deletar(Long id)
-        +long contarClientes()
-    }
+    subgraph "Camada de Apresentação (Controller)"
+        ClienteController
+        ProdutoController
+        PedidoController
+    end
 
-    class ClienteServiceImpl {
-        -ClienteRepository clienteRepository
-        -ModelMapper modelMapper
-        +List~Cliente~ listarTodos()
-        +Optional~Cliente~ buscarPorId(Long id)
-        +List~Cliente~ buscarPorNome(String nome)
-        +Cliente salvar(ClienteDTO dto)
-        +Cliente atualizar(Long id, ClienteDTO dto)
-        +void deletar(Long id)
-        +long contarClientes()
-    }
+    subgraph "Camada de Serviço (Service)"
+        IClienteService { <<Interface>> }
+        ClienteServiceImpl
+        IProdutoService { <<Interface>> }
+        ProdutoServiceImpl
+        IPedidoService { <<Interface>> }
+        PedidoServiceImpl
+    end
 
-    class ClienteRepository {
-        <<Interface (JPA)>>
-        +List~Cliente~ findByNomeContainingIgnoreCase(String nome)
-        +Optional~Cliente~ findByEmail(String email)
-    }
+    subgraph "Camada de Repositório (Repository)"
+        ClienteRepository { <<Interface>> }
+        ProdutoRepository { <<Interface>> }
+        PedidoRepository { <<Interface>> }
+    end
 
-    class Cliente {
-        -Long id
-        -String nome
-        -String email
-        -String telefone
-        -String endereco
-    }
-    
-    class ClienteDTO {
-      -String nome
-      -String email
-      -String telefone
-      -String endereco
-    }
+    subgraph "Camada de Domínio (Model)"
+        class Cliente {
+          -Long id
+          -String nome
+          -String email
+        }
+        class Produto {
+          -Long id
+          -String nome
+          -BigDecimal preco
+        }
+        class Pedido {
+          -Long id
+          -LocalDateTime dataPedido
+          -BigDecimal valorTotal
+        }
+        class ItemPedido {
+          -Long id
+          -Integer quantidade
+        }
+    end
 
-    ClienteController ..> IClienteService : depends on
-    ClienteServiceImpl ..|> IClienteService : implements
-    ClienteServiceImpl ..> ClienteRepository : depends on
-    ClienteServiceImpl ..> Cliente : works with
-    ClienteController ..> ClienteDTO : uses
-    ClienteServiceImpl ..> ClienteDTO : uses
-```
+    ClienteController ..> IClienteService
+    ProdutoController ..> IProdutoService
+    PedidoController ..> IPedidoService
 
-### Diagrama de Sequência: Buscar Cliente por ID
+    ClienteServiceImpl ..|> IClienteService
+    ProdutoServiceImpl ..|> IProdutoService
+    PedidoServiceImpl ..|> IPedidoService
 
-Este diagrama ilustra a sequência de chamadas para a funcionalidade de busca de um cliente pelo seu ID.
+    ClienteServiceImpl ..> ClienteRepository
+    ProdutoServiceImpl ..> ProdutoRepository
+    PedidoServiceImpl ..> PedidoRepository
+    PedidoServiceImpl ..> ClienteRepository : usa
+    PedidoServiceImpl ..> ProdutoRepository : usa
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Controller as ClienteController
-    participant Service as IClienteService
-    participant Repository as ClienteRepository
-    participant DB as Banco de Dados (PostgreSQL)
+    ClienteRepository --o Cliente
+    ProdutoRepository --o Produto
+    PedidoRepository --o Pedido
 
-    User->>Controller: GET /api/clientes/{id}
-    Controller->>Service: buscarPorId(id)
-    Service->>Repository: findById(id)
-    Repository->>DB: SELECT * FROM clientes WHERE id = ?
-    DB-->>Repository: Retorna dados do cliente
-    Repository-->>Service: Retorna Optional~Cliente~
-    Service-->>Controller: Retorna Cliente
-    Controller-->>User: Responde com 200 OK e JSON do Cliente
+    Pedido "1" -- "1..*" ItemPedido : contém
+    Cliente "1" -- "0..*" Pedido : faz
+    Produto "1" -- "0..*" ItemPedido : compõe
 ```
 
 ### C4 Model Nível 3: Diagrama de Componentes (Domínio Produto)
@@ -361,216 +348,4 @@ graph TD
     component_repository -- "Lê e escreve em" --> container_db
 ```
 
-### C4 Model Nível 4: Diagrama de Classes (Domínio Cliente)
-
-Este diagrama mostra as principais classes envolvidas no domínio "Cliente" e seus relacionamentos.
-
-```mermaid
-classDiagram
-    class ClienteController {
-        -IClienteService clienteService
-        +ResponseEntity~List~Cliente~~ listarTodos()
-        +ResponseEntity~Cliente~ buscarPorId(Long id)
-        +ResponseEntity~List~Cliente~~ buscarPorNome(String nome)
-        +ResponseEntity~Cliente~ criar(ClienteDTO dto)
-        +ResponseEntity~Cliente~ atualizar(Long id, ClienteDTO dto)
-        +ResponseEntity~Void~ deletar(Long id)
-        +ResponseEntity~Long~ contarClientes()
-    }
-
-    class IClienteService {
-        <<Interface>>
-        +List~Cliente~ listarTodos()
-        +Optional~Cliente~ buscarPorId(Long id)
-        +List~Cliente~ buscarPorNome(String nome)
-        +Cliente salvar(ClienteDTO dto)
-        +Cliente atualizar(Long id, ClienteDTO dto)
-        +void deletar(Long id)
-        +long contarClientes()
-    }
-
-    class ClienteServiceImpl {
-        -ClienteRepository clienteRepository
-        -ModelMapper modelMapper
-        +List~Cliente~ listarTodos()
-        +Optional~Cliente~ buscarPorId(Long id)
-        +List~Cliente~ buscarPorNome(String nome)
-        +Cliente salvar(ClienteDTO dto)
-        +Cliente atualizar(Long id, ClienteDTO dto)
-        +void deletar(Long id)
-        +long contarClientes()
-    }
-
-    class ClienteRepository {
-        <<Interface (JPA)>>
-        +List~Cliente~ findByNomeContainingIgnoreCase(String nome)
-        +Optional~Cliente~ findByEmail(String email)
-    }
-
-    class Cliente {
-        -Long id
-        -String nome
-        -String email
-        -String telefone
-        -String endereco
-    }
-    
-    class ClienteDTO {
-      -String nome
-      -String email
-      -String telefone
-      -String endereco
-    }
-
-    ClienteController ..> IClienteService : depends on
-    ClienteServiceImpl ..|> IClienteService : implements
-    ClienteServiceImpl ..> ClienteRepository : depends on
-    ClienteServiceImpl ..> Cliente : works with
-    ClienteController ..> ClienteDTO : uses
-    ClienteServiceImpl ..> ClienteDTO : uses
-```
-
-### C4 Model Nível 4: Diagrama de Classes (Domínio Produto)
-
-Este diagrama mostra as principais classes envolvidas no domínio "Produto".
-
-```mermaid
-classDiagram
-    class ProdutoController {
-        -IProdutoService produtoService
-        +ResponseEntity~Produto~ criar(ProdutoDTO dto)
-        +ResponseEntity~Produto~ buscarPorId(Long id)
-    }
-
-    class IProdutoService {
-        <<Interface>>
-        +Produto salvar(ProdutoDTO dto)
-        +Optional~Produto~ buscarPorId(Long id)
-    }
-
-    class ProdutoServiceImpl {
-        -ProdutoRepository produtoRepository
-        -ModelMapper modelMapper
-    }
-
-    class ProdutoRepository {
-        <<Interface (JPA)>>
-        +List~Produto~ findByNomeContainingIgnoreCase(String nome)
-    }
-
-    class Produto {
-        -Long id
-        -String nome
-        -String descricao
-        -BigDecimal preco
-        -Integer quantidadeEstoque
-        -CategoriaProduto categoria
-    }
-    
-    class ProdutoDTO {
-      -String nome
-      -String descricao
-      -BigDecimal preco
-      -Integer quantidadeEstoque
-      -CategoriaProduto categoria
-    }
-
-    ProdutoController ..> IProdutoService
-    ProdutoServiceImpl ..|> IProdutoService
-    ProdutoServiceImpl ..> ProdutoRepository
-    ProdutoServiceImpl ..> Produto
-    ProdutoController ..> ProdutoDTO
-    ProdutoServiceImpl ..> ProdutoDTO
-```
-
-### C4 Model Nível 4: Diagrama de Classes (Domínio Pedido)
-
-Este diagrama mostra a complexidade e os relacionamentos das classes no domínio "Pedido".
-
-```mermaid
-classDiagram
-    direction TB
-    
-    class Pedido {
-      -Long id
-      -LocalDateTime dataPedido
-      -StatusPedido status
-      -BigDecimal valorTotal
-    }
-    
-    class ItemPedido {
-      -Long id
-      -Integer quantidade
-      -BigDecimal precoUnitario
-    }
-
-    class PedidoController {
-        -IPedidoService pedidoService
-        +ResponseEntity~Pedido~ criar(PedidoDTO dto)
-    }
-
-    class IPedidoService {
-        <<Interface>>
-        +Pedido salvar(PedidoDTO dto)
-    }
-    
-    class PedidoServiceImpl {
-        -IPedidoRepository pedidoRepository
-        -IClienteRepository clienteRepository
-        -IProdutoRepository produtoRepository
-        -PedidoValidator pedidoValidator
-        -PedidoCalculator pedidoCalculator
-    }
-
-    class PedidoValidator {
-        +void validarPedido(Pedido pedido)
-    }
-
-    class PedidoCalculator {
-        +void calcularValorTotal(Pedido pedido)
-    }
-
-    Pedido "1" -- "1..*" ItemPedido : contém
-    Cliente "1" -- "0..*" Pedido : faz
-    Produto "1" -- "0..*" ItemPedido : compõe
-
-    PedidoController ..> IPedidoService
-    PedidoServiceImpl ..|> IPedidoService
-    PedidoServiceImpl ..> PedidoValidator
-    PedidoServiceImpl ..> PedidoCalculator
-    PedidoServiceImpl ..> PedidoRepository
-    PedidoServiceImpl ..> ClienteRepository
-    PedidoServiceImpl ..> ProdutoRepository
-```
-
-### Diagrama de Sequência: Criar um Novo Pedido
-
-Este diagrama ilustra o fluxo complexo para a criação de um novo pedido.
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Controller as PedidoController
-    participant Service as IPedidoService
-    participant Validator as PedidoValidator
-    participant Calculator as PedidoCalculator
-    participant Repo as PedidoRepository
-    participant DB as Banco de Dados
-
-    User->>Controller: POST /api/pedidos com PedidoDTO
-    Controller->>Service: salvar(pedidoDTO)
-    
-    Service->>Validator: validarPedido(pedido)
-    Validator-->>Service: OK
-    
-    Service->>Calculator: calcularValorTotal(pedido)
-    Calculator-->>Service: Valor Calculado
-    
-    Service->>Repo: save(pedido)
-    Repo->>DB: INSERT em pedidos e itens_pedido
-    DB-->>Repo: Pedido salvo
-    Repo-->>Service: Retorna Pedido com ID
-    
-    Service-->>Controller: Retorna Pedido salvo
-    Controller-->>User: Responde com 201 Created e JSON do Pedido
-``` 
+</rewritten_file>
