@@ -231,7 +231,7 @@ DELETE /api/pedidos/{id}          # Deletar pedido (Delete)
 ## 📊 Entregáveis do Desafio
 
 ### 1. ✅ Desenho Arquitetural
-- **Arquivo**: `ARQUITETURA.md`
+- **Arquivo**: `DESENHO_ARQUITETURAL.md`
 - **Descrição**: Documentação detalhada da arquitetura MVC implementada
 - **Diagramas**: Estrutura de componentes e relacionamentos
 
@@ -240,17 +240,12 @@ DELETE /api/pedidos/{id}          # Deletar pedido (Delete)
 - **Descrição**: Estrutura organizada seguindo padrão MVC
 - **Explicação**: Papel de cada componente (Controller, Model, Service)
 
-### 3. ✅ Diagrama UML
-- **Arquivo**: `DIAGRAMA_UML.md`
-- **Descrição**: Diagrama de classes com entidades e relacionamentos
-- **Ferramenta**: Mermaid (compatível com draw.io)
-
-### 4. ✅ Código Funcionando
+### 3. ✅ Código Funcionando
 - **Repositório**: Código completo e funcional
 - **Testes**: Testes unitários implementados
 - **Documentação**: OpenAPI/Swagger completa
 
-### 5. ✅ Persistência Funcionando
+### 4. ✅ Persistência Funcionando
 - **Banco**: PostgreSQL com Docker
 - **Migrações**: Flyway para versionamento
 - **Relacionamentos**: JPA com mapeamentos corretos
