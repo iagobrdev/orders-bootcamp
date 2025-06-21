@@ -382,7 +382,11 @@ classDiagram
     }
     
     class ItemPedido {
+        -Long id
+        -Produto produto
         -Integer quantidade
+        -BigDecimal precoUnitario
+        -BigDecimal subtotal
     }
 
     class Cliente
@@ -395,7 +399,7 @@ classDiagram
     PedidoServiceImpl ..> ProdutoRepository
     
     PedidoRepository --o Pedido
-    Pedido "1" -- "1..*" ItemPedido
+    Pedido "1" *-- "N" ItemPedido
     Cliente "1" -- "0..*" Pedido
     Produto "1" -- "0..*" ItemPedido
 ```
