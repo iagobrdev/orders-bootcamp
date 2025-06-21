@@ -2,6 +2,7 @@ package com.br.bootcamp.orders.model;
 
 import com.br.bootcamp.orders.model.enums.StatusPedido;
 import com.br.bootcamp.orders.model.enums.TipoPagamento;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,5 +59,6 @@ public class Pedido implements Serializable {
     private BigDecimal valorTotal;
     
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<ItemPedido> itens;
 } 
