@@ -94,12 +94,12 @@ src/main/java/com/br/bootcamp/orders/
 ## 🚀 Tecnologias Utilizadas
 
 ### Plataforma e Linguagem
-- **Java 21** com **Spring Boot 3.2.0** (conforme solicitado no enunciado)
+- **Java 21** com **Spring Boot 3.2.0**
 
 ### Dependências Principais
 - **Spring Web**: Criação da API REST
 - **Spring Data JPA**: Persistência de dados
-- **PostgreSQL**: Banco de dados (diferencial mencionado no enunciado)
+- **PostgreSQL**: Banco de dados
 - **Flyway**: Migrações de banco
 - **OpenAPI 3**: Documentação da API
 - **Docker Compose**: Infraestrutura
