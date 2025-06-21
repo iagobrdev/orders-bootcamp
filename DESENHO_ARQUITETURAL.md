@@ -202,20 +202,31 @@ graph TD
         oc("PedidoController<br>[Componente]")
     end
 
+    subgraph "Camada de Interfaces (Contracts)"
+        direction LR
+        ics("IClienteService<br>[Interface]")
+        ips("IProdutoService<br>[Interface]")
+        ios("IPedidoService<br>[Interface]")
+    end
+
     subgraph "Camada de Serviços (Services)"
         direction LR
-        cs("ClienteService<br>[Componente]")
-        ps("ProdutoService<br>[Componente]")
-        os("PedidoService<br>[Componente]")
+        cs("ClienteServiceImpl<br>[Componente]")
+        ps("ProdutoServiceImpl<br>[Componente]")
+        os("PedidoServiceImpl<br>[Componente]")
     end
 
     db("Banco de Dados<br>[Container: PostgreSQL]")
 
     api --> cc & pc & oc
 
-    cc -- "Usa" --> cs
-    pc -- "Usa" --> ps
-    oc -- "Usa" --> os
+    cc -- "Usa" --> ics
+    pc -- "Usa" --> ips
+    oc -- "Usa" --> ios
+    
+    cs -- "Implementa" --> ics
+    ps -- "Implementa" --> ips
+    os -- "Implementa" --> ios
 
     cs -- "Acessa" --> db
     ps -- "Acessa" --> db
