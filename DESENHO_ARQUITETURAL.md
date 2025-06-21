@@ -155,123 +155,91 @@ src/main/java/com/br/bootcamp/orders/
 
 ## 3. Diagramas (C4 Model)
 
-### C4 Model Nível 1: Diagrama de Contexto
+### C4 Model Nível 1: Diagrama de Contexto MVC
 
-Este diagrama apresenta uma visão geral do sistema, seus usuários e as interações de alto nível.
+Este diagrama apresenta a visão mais abstrata do sistema, mostrando-o como uma caixa preta com a qual o usuário interage.
 
 ```mermaid
 graph TD
-    subgraph "Sistema de Gestão de Pedidos"
-        direction LR
-        
-        person_intern_user("Usuário Interno<br/>[Person]<br/>Funcionário da empresa")
-        person_extern_user("Parceiro / Cliente<br/>[Person]<br/>Consumidor da API")
-        
-        system_orders("API de Pedidos<br/>[Software System]<br/>Permite o gerenciamento de<br/>Clientes, Produtos e Pedidos.")
-        
-        person_intern_user -- "Consulta e gerencia dados" --> system_orders
-        person_extern_user -- "Realiza pedidos e consultas via API" --> system_orders
-    end
+    person_user("Usuário<br/>[Person]<br/>Cliente ou Parceiro")
+    system_mvc("Sistema de Pedidos<br/>[Software System]<br/>Plataforma de gerenciamento<br/>baseada em MVC.")
+    
+    person_user -- "Interage via API REST" --> system_mvc
 ```
 
 ### C4 Model Nível 2: Diagrama de Contêineres
 
-Este diagrama detalha os contêineres que compõem o sistema (aplicações e bancos de dados).
+Este diagrama detalha os principais contêineres que compõem a solução: a aplicação API e o banco de dados.
 
 ```mermaid
 graph TD
-    subgraph "Ambiente Operacional"
-        direction TB
-
-        person_user("Usuário<br/>[Person]<br/>Interno ou Externo")
-
-        subgraph "Sistema de Pedidos"
-            direction TB
-            
-            container_api("API REST<br/>[Container: Spring Boot]<br/>Gerencia a lógica de negócio<br/>e expõe os endpoints.")
-            container_db("Banco de Dados<br/>[Container: PostgreSQL]<br/>Armazena os dados de<br/>Clientes, Produtos e Pedidos.")
-            
-            container_api -- "Lê e escreve em" --> container_db
-        end
-
-        person_user -- "Faz requisições HTTPS/JSON para" --> container_api
-    end
-```
-
-### C4 Model Nível 3: Diagrama de Componentes (Domínio Cliente)
-
-Este diagrama foca nos componentes internos do contêiner da API, mostrando como as funcionalidades do domínio "Cliente" são implementadas.
-
-```mermaid
-graph TD
-    subgraph "Contêiner: API REST (Spring Boot)"
-        direction TB
-
-        component_controller("ClienteController<br/>[Componente: Spring @RestController]<br/>Recebe requisições HTTP e<br/>expõe a API para o domínio Cliente.")
-        component_service("ClienteService<br/>[Componente: Spring @Service]<br/>Implementa as regras de negócio<br/>para o gerenciamento de clientes.")
-        component_repository("ClienteRepository<br/>[Componente: Spring @Repository]<br/>Gerencia o acesso e a<br/>persistência dos dados de clientes.")
-
-        component_controller -- "Chama" --> component_service
-        component_service -- "Usa" --> component_repository
-    end
-
     person_user("Usuário<br/>[Person]")
-    container_db("Banco de Dados<br/>[Container: PostgreSQL]")
     
-    person_user -- "Interage com" --> component_controller
-    component_repository -- "Lê e escreve em" --> container_db
+    subgraph "Sistema de Pedidos"
+        container_api("API REST<br/>[Container: Spring Boot]<br/>Expõe os endpoints e contém<br/>toda a lógica de negócio.")
+        container_db("Banco de Dados<br/>[Container: PostgreSQL]<br/>Armazena os dados de<br/>Clientes, Produtos e Pedidos.")
+        
+        container_api -- "Lê e Escreve<br/>[JDBC]" --> container_db
+    end
+
+    person_user -- "Faz requisições<br/>[HTTPS/JSON]" --> container_api
 ```
 
-### C4 Model Nível 4: Diagrama de Classes
+### C4 Model Nível 3: Diagrama de Componentes
 
+Este diagrama mostra os principais componentes lógicos da API, representando as funcionalidades centrais do sistema.
+
+```mermaid
+graph TD
+    subgraph "Contêiner: API REST"
+        component_clientes("Gestão de Clientes<br/>[Componente]<br/>Gerencia o CRUD e as<br/>regras para clientes.")
+        component_produtos("Gestão de Produtos<br/>[Componente]<br/>Gerencia o CRUD e as<br/>regras para produtos.")
+        component_pedidos("Gestão de Pedidos<br/>[Componente]<br/>Orquestra o CRUD e as<br/>regras para pedidos.")
+    end
+    
+    container_db("Banco de Dados<br/>[Container: PostgreSQL]")
+
+    component_clientes -- "Usa" --> container_db
+    component_produtos -- "Usa" --> container_db
+    component_pedidos -- "Usa" --> container_db
+```
+
+### C4 Model Nível 4: Classes e Sequência
+
+#### Diagrama de Classes
 Este diagrama mostra as principais classes que compõem a solução, seus relacionamentos e a separação entre as camadas MVC.
 
 ```mermaid
 classDiagram
     direction TB
 
-    subgraph "Camada de Apresentação (Controller)"
-        ClienteController
-        ProdutoController
-        PedidoController
-    end
+    package "Controller (View)" {
+        class ClienteController
+        class ProdutoController
+        class PedidoController
+    }
 
-    subgraph "Camada de Serviço (Service)"
-        IClienteService { <<Interface>> }
-        ClienteServiceImpl
-        IProdutoService { <<Interface>> }
-        ProdutoServiceImpl
-        IPedidoService { <<Interface>> }
-        PedidoServiceImpl
-    end
+    package "Service (Controller Logic)" {
+        class IClienteService
+        class ClienteServiceImpl
+        class IProdutoService
+        class ProdutoServiceImpl
+        class IPedidoService
+        class PedidoServiceImpl
+    }
 
-    subgraph "Camada de Repositório (Repository)"
-        ClienteRepository { <<Interface>> }
-        ProdutoRepository { <<Interface>> }
-        PedidoRepository { <<Interface>> }
-    end
+    package "Repository (Data Access)" {
+        class ClienteRepository
+        class ProdutoRepository
+        class PedidoRepository
+    }
 
-    subgraph "Camada de Domínio (Model)"
-        class Cliente {
-          -Long id
-          -String nome
-          -String email
-        }
-        class Produto {
-          -Long id
-          -String nome
-          -BigDecimal preco
-        }
-        class Pedido {
-          -Long id
-          -LocalDateTime dataPedido
-          -BigDecimal valorTotal
-        }
-        class ItemPedido {
-          -Long id
-          -Integer quantidade
-        }
-    end
+    package "Model (Domain)" {
+        class Cliente
+        class Produto
+        class Pedido
+        class ItemPedido
+    }
 
     ClienteController ..> IClienteService
     ProdutoController ..> IProdutoService
@@ -284,8 +252,6 @@ classDiagram
     ClienteServiceImpl ..> ClienteRepository
     ProdutoServiceImpl ..> ProdutoRepository
     PedidoServiceImpl ..> PedidoRepository
-    PedidoServiceImpl ..> ClienteRepository : usa
-    PedidoServiceImpl ..> ProdutoRepository : usa
 
     ClienteRepository --o Cliente
     ProdutoRepository --o Produto
@@ -296,56 +262,24 @@ classDiagram
     Produto "1" -- "0..*" ItemPedido : compõe
 ```
 
-### C4 Model Nível 3: Diagrama de Componentes (Domínio Produto)
-
-Este diagrama foca nos componentes internos do contêiner da API para o domínio "Produto".
-
-```mermaid
-graph TD
-    subgraph "Contêiner: API REST (Spring Boot)"
-        direction TB
-
-        component_controller("ProdutoController<br/>[Componente: Spring @RestController]<br/>Recebe requisições HTTP e<br/>expõe a API para o domínio Produto.")
-        component_service("ProdutoService<br/>[Componente: Spring @Service]<br/>Implementa as regras de negócio<br/>para o gerenciamento de produtos.")
-        component_repository("ProdutoRepository<br/>[Componente: Spring @Repository]<br/>Gerencia o acesso e a<br/>persistência dos dados de produtos.")
-
-        component_controller -- "Chama" --> component_service
-        component_service -- "Usa" --> component_repository
-    end
-
-    person_user("Usuário<br/>[Person]")
-    container_db("Banco de Dados<br/>[Container: PostgreSQL]")
-    
-    person_user -- "Interage com" --> component_controller
-    component_repository -- "Lê e escreve em" --> container_db
-```
-
-### C4 Model Nível 3: Diagrama de Componentes (Domínio Pedido)
-
-Este diagrama foca nos componentes internos do contêiner da API para o domínio "Pedido", incluindo seus utilitários.
+#### Diagrama de Sequência Genérico: Criação de um Registro
+Este diagrama ilustra um fluxo genérico para a criação de um novo registro no sistema.
 
 ```mermaid
-graph TD
-    subgraph "Contêiner: API REST (Spring Boot)"
-        direction TB
+sequenceDiagram
+    participant User
+    participant Controller
+    participant Service
+    participant Repository
+    participant Database
 
-        component_controller("PedidoController<br/>[Componente: Spring @RestController]<br/>Recebe requisições HTTP e<br/>expõe a API para o domínio Pedido.")
-        component_service("PedidoService<br/>[Componente: Spring @Service]<br/>Implementa as regras de negócio<br/>para o gerenciamento de pedidos.")
-        component_validator("PedidoValidator<br/>[Componente: Spring @Component]<br/>Valida regras de negócio<br/>complexas para pedidos.")
-        component_calculator("PedidoCalculator<br/>[Componente: Spring @Component]<br/>Calcula o valor total e<br/>subtotais dos pedidos.")
-        component_repository("PedidoRepository<br/>[Componente: Spring @Repository]<br/>Gerencia o acesso e a<br/>persistência dos dados de pedidos.")
-
-        component_controller -- "Chama" --> component_service
-        component_service -- "Usa" --> component_validator
-        component_service -- "Usa" --> component_calculator
-        component_service -- "Usa" --> component_repository
-    end
-
-    person_user("Usuário<br/>[Person]")
-    container_db("Banco de Dados<br/>[Container: PostgreSQL]")
-    
-    person_user -- "Interage com" --> component_controller
-    component_repository -- "Lê e escreve em" --> container_db
+    User->>Controller: Requisição POST com dados (DTO)
+    Controller->>Service: salvar(dto)
+    Service->>Service: Validações de Negócio
+    Service->>Repository: save(entity)
+    Repository->>Database: INSERT na tabela correspondente
+    Database-->>Repository: Retorna registro com ID
+    Repository-->>Service: Retorna entidade salva
+    Service-->>Controller: Retorna entidade salva
+    Controller-->>User: Resposta 201 Created com JSON
 ```
-
-</rewritten_file>
