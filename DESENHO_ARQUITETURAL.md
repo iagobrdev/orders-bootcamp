@@ -187,89 +187,23 @@ graph TD
 
 ### C4 Model Nível 3: Diagrama de Componentes
 
-Este nível do C4 Model detalha os componentes internos do contêiner "API REST". Cada diagrama abaixo representa um domínio de negócio (`Produto`, `Cliente`, `Pedido`), mostrando os principais componentes (funcionalidades) e suas interações com o banco de dados.
-
-#### Domínio: Produto
+Este diagrama detalha os principais componentes que formam a API REST, ilustrando a separação de responsabilidades da arquitetura MVC. As requisições são recebidas pela camada de `Controller`, que orquestra a execução da lógica de negócio na camada de `Service`. A camada de `Service` então interage com o banco de dados.
 
 ```mermaid
 graph TD
-    api_container("API REST<br>[Container]")
+    container_api("API REST<br>[Container]")
     
-    subgraph "Componentes do Domínio Produto"
-        p1("Lista todos os Produtos<br>[Componente]")
-        p2("Lista Produtos por Nome<br>[Componente]")
-        p3("Busca Produto por Id<br>[Componente]")
-        p4("Grava Produto<br>[Componente]<br>Insere e atualiza produtos")
-        p5("Deleta Produto por Id<br>[Componente]")
-        p6("Conta Produtos Cadastrados<br>[Componente]")
+    subgraph "Componentes da API"
+        direction TB
+        c("Controllers<br>[Componente]<br>Recebem requisições HTTP e<br>orquestram as operações.")
+        s("Services<br>[Componente]<br>Contêm a lógica de negócio,<br>validações e regras.")
     end
     
     db("Banco de Dados<br>[Container: PostgreSQL]")
 
-    api_container --> p1 & p2 & p3 & p4 & p5 & p6
-    
-    p1 -- "Lê de" --> db
-    p2 -- "Lê de" --> db
-    p3 -- "Lê de" --> db
-    p4 -- "Escreve em" --> db
-    p5 -- "Escreve em" --> db
-    p6 -- "Lê de" --> db
-```
-
-#### Domínio: Cliente
-
-```mermaid
-graph TD
-    api_container("API REST<br>[Container]")
-    
-    subgraph "Componentes do Domínio Cliente"
-        c1("Lista todos os Clientes<br>[Componente]")
-        c2("Lista Clientes por Nome<br>[Componente]")
-        c3("Busca Cliente por Id<br>[Componente]")
-        c4("Grava Cliente<br>[Componente]<br>Insere e atualiza clientes")
-        c5("Deleta Cliente por Id<br>[Componente]")
-        c6("Conta Clientes Cadastrados<br>[Componente]")
-    end
-    
-    db("Banco de Dados<br>[Container: PostgreSQL]")
-    
-    api_container --> c1 & c2 & c3 & c4 & c5 & c6
-    
-    c1 -- "Lê de" --> db
-    c2 -- "Lê de" --> db
-    c3 -- "Lê de" --> db
-    c4 -- "Escreve em" --> db
-    c5 -- "Escreve em" --> db
-    c6 -- "Lê de" --> db
-```
-
-#### Domínio: Pedido
-
-```mermaid
-graph TD
-    api_container("API REST<br>[Container]")
-    
-    subgraph "Componentes do Domínio Pedido"
-        o1("Lista todos os Pedidos<br>[Componente]")
-        o2("Busca Pedido por Id<br>[Componente]")
-        o3("Busca Pedidos por Cliente<br>[Componente]")
-        o4("Busca Pedidos por Status<br>[Componente]")
-        o5("Grava Pedido<br>[Componente]<br>Insere e atualiza pedidos")
-        o6("Deleta Pedido por Id<br>[Componente]")
-        o7("Conta Pedidos Cadastrados<br>[Componente]")
-    end
-    
-    db("Banco de Dados<br>[Container: PostgreSQL]")
-
-    api_container --> o1 & o2 & o3 & o4 & o5 & o6 & o7
-
-    o1 -- "Lê de" --> db
-    o2 -- "Lê de" --> db
-    o3 -- "Lê de" --> db
-    o4 -- "Lê de" --> db
-    o5 -- "Escreve em" --> db
-    o6 -- "Escreve em" --> db
-    o7 -- "Lê de" --> db
+    container_api -- "Encaminha para" --> c
+    c -- "Chama" --> s
+    s -- "Lê e Escreve em<br>[JDBC]" --> db
 ```
 
 ### C4 Model Nível 4: Pacotes, Classes e Sequência
