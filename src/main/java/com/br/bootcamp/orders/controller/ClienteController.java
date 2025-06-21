@@ -3,7 +3,7 @@ package com.br.bootcamp.orders.controller;
 import com.br.bootcamp.orders.model.Cliente;
 import com.br.bootcamp.orders.model.dto.ClienteDTO;
 import com.br.bootcamp.orders.model.dto.ErrorResponseDTO;
-import com.br.bootcamp.orders.service.ClienteServiceImpl;
+import com.br.bootcamp.orders.service.contracts.IClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,14 +28,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Tag(name = "Clientes", description = "Endpoints para gerenciamento de clientes")
 public class ClienteController {
-    private final ClienteServiceImpl clienteService;
 
-    public ClienteController(ClienteServiceImpl clienteService) {
-        this.clienteService = clienteService;
-    }
+    private final IClienteService clienteService;
     
     /**
      * GET /api/clientes - Lista todos os clientes

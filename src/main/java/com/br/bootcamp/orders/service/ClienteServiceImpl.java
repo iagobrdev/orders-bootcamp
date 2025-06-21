@@ -1,11 +1,11 @@
 package com.br.bootcamp.orders.service;
 
-import com.br.bootcamp.orders.service.exception.BusinessException;
-import com.br.bootcamp.orders.service.exception.ResourceNotFoundException;
 import com.br.bootcamp.orders.model.Cliente;
 import com.br.bootcamp.orders.model.dto.ClienteDTO;
 import com.br.bootcamp.orders.repository.ClienteRepository;
 import com.br.bootcamp.orders.service.contracts.IClienteService;
+import com.br.bootcamp.orders.service.exception.BusinessException;
+import com.br.bootcamp.orders.service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -62,6 +62,7 @@ public class ClienteServiceImpl implements IClienteService {
     /**
      * Salva um novo cliente
      */
+    @Override
     public Cliente salvar(ClienteDTO clienteDTO) {
         if (clienteRepository.existsByEmail(clienteDTO.getEmail())) {
             throw new BusinessException("Já existe um cliente cadastrado com este email: " + clienteDTO.getEmail());
@@ -70,31 +71,15 @@ public class ClienteServiceImpl implements IClienteService {
         return clienteRepository.save(cliente);
     }
     
-    @Override
-    public Cliente salvar(Cliente cliente) {
-        if (cliente.getId() == null && clienteRepository.existsByEmail(cliente.getEmail())) {
-            throw new BusinessException("Já existe um cliente cadastrado com este email: " + cliente.getEmail());
-        }
-        return clienteRepository.save(cliente);
-    }
-    
     /**
      * Atualiza um cliente existente
      */
+    @Override
     public Cliente atualizar(Long id, ClienteDTO clienteDTO) {
         if (!clienteRepository.existsById(id)) {
             throw new ResourceNotFoundException("Cliente não encontrado com ID: " + id);
         }
         Cliente cliente = modelMapper.map(clienteDTO, Cliente.class);
-        cliente.setId(id);
-        return clienteRepository.save(cliente);
-    }
-    
-    @Override
-    public Cliente atualizar(Long id, Cliente cliente) {
-        if (!clienteRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Cliente não encontrado com ID: " + id);
-        }
         cliente.setId(id);
         return clienteRepository.save(cliente);
     }

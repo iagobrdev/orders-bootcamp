@@ -1,6 +1,7 @@
 package com.br.bootcamp.orders.service.contracts;
 
 import com.br.bootcamp.orders.model.Produto;
+import com.br.bootcamp.orders.model.dto.ProdutoDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +92,7 @@ public interface IProdutoService {
      * @throws IllegalArgumentException se o produto for null ou dados inválidos
      * @throws RuntimeException se houver erro na persistência
      */
-    Produto salvar(Produto produto);
+    Produto salvar(ProdutoDTO produto);
     
     /**
      * Atualiza os dados de um produto existente.
@@ -105,7 +106,7 @@ public interface IProdutoService {
      * @throws IllegalArgumentException se o ID for null ou o produto for null
      * @throws RuntimeException se o produto não existir ou houver erro na atualização
      */
-    Produto atualizar(Long id, Produto produto);
+    Produto atualizar(Long id, ProdutoDTO produto);
     
     /**
      * Remove um produto do sistema.

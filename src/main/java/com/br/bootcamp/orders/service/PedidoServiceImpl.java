@@ -1,11 +1,15 @@
 package com.br.bootcamp.orders.service;
 
+import com.br.bootcamp.orders.model.ItemPedido;
+import com.br.bootcamp.orders.model.Produto;
 import com.br.bootcamp.orders.service.exception.BusinessException;
 import com.br.bootcamp.orders.service.exception.ResourceNotFoundException;
 import com.br.bootcamp.orders.model.Pedido;
 import com.br.bootcamp.orders.model.dto.PedidoDTO;
 import com.br.bootcamp.orders.model.enums.StatusPedido;
+import com.br.bootcamp.orders.repository.ClienteRepository;
 import com.br.bootcamp.orders.repository.PedidoRepository;
+import com.br.bootcamp.orders.repository.ProdutoRepository;
 import com.br.bootcamp.orders.service.contracts.IPedidoService;
 import com.br.bootcamp.orders.service.util.PedidoCalculator;
 import com.br.bootcamp.orders.service.util.PedidoValidator;
@@ -15,9 +19,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +34,8 @@ import java.util.Optional;
 public class PedidoServiceImpl implements IPedidoService {
     
     private final PedidoRepository pedidoRepository;
+    private final ProdutoRepository produtoRepository;
+    private final ClienteRepository clienteRepository;
     private final PedidoValidator pedidoValidator;
     private final PedidoCalculator pedidoCalculator;
     private final ModelMapper modelMapper;
@@ -63,72 +74,133 @@ public class PedidoServiceImpl implements IPedidoService {
     }
     
     /**
+     * Busca pedidos por data específica
+     */
+    @Override
+    public List<Pedido> buscarPorData(LocalDate data) {
+        return pedidoRepository.findByDataPedidoDate(data);
+    }
+    
+    /**
      * Busca pedidos por período
      */
     @Override
-    public List<Pedido> buscarPorPeriodo(LocalDateTime dataInicio, LocalDateTime dataFim) {
-        return pedidoRepository.findByDataPedidoBetween(dataInicio, dataFim);
+    public List<Pedido> buscarPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        LocalDateTime inicio = dataInicio.atStartOfDay();
+        LocalDateTime fim = dataFim.atTime(23, 59, 59);
+        return pedidoRepository.findByDataPedidoBetween(inicio, fim);
     }
     
     /**
      * Salva um novo pedido a partir de DTO
      */
+    @Override
     public Pedido salvar(PedidoDTO pedidoDTO) {
         log.info("Iniciando criação de novo pedido a partir de DTO");
         
-        Pedido pedido = modelMapper.map(pedidoDTO, Pedido.class);
-        
+        Pedido pedido = new Pedido();
+        pedido.setItens(new ArrayList<>());
+
         try {
+            clienteRepository.findById(pedidoDTO.getClienteId())
+                .ifPresentOrElse(
+                    pedido::setCliente,
+                    () -> { throw new BusinessException("Cliente não encontrado com ID: " + pedidoDTO.getClienteId()); }
+                );
+            
+            pedido.setTipoPagamento(pedidoDTO.getTipoPagamento());
+
+            pedidoDTO.getItens().forEach(itemDTO -> {
+                Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
+                        .orElseThrow(() -> new BusinessException("Produto não encontrado com ID: " + itemDTO.getProdutoId()));
+
+                ItemPedido item = new ItemPedido();
+                item.setProduto(produto);
+                item.setQuantidade(itemDTO.getQuantidade());
+                item.setPedido(pedido);
+
+                pedido.getItens().add(item);
+            });
+
             pedidoValidator.validarPedido(pedido);
             configurarDadosIniciais(pedido);
             pedidoCalculator.prepararPedido(pedido);
+            
+            Pedido pedidoSalvo = pedidoRepository.save(pedido);
+        
+            log.info("Pedido criado com sucesso - ID: {}, Valor Total: {}", 
+                    pedidoSalvo.getId(), pedidoSalvo.getValorTotal());
+            
+            return pedidoSalvo;
+
         } catch (RuntimeException e) {
-            throw new BusinessException(e.getMessage());
+            log.error("Erro ao criar o pedido: {}", e.getMessage(), e);
+            throw new BusinessException("Erro ao processar o pedido. Verifique os dados fornecidos.");
         }
-        
-        Pedido pedidoSalvo = pedidoRepository.save(pedido);
-        
-        log.info("Pedido criado com sucesso - ID: {}, Valor Total: {}", 
-                pedidoSalvo.getId(), pedidoSalvo.getValorTotal());
-        
-        return pedidoSalvo;
-    }
-    
-    /**
-     * Salva um novo pedido (método original)
-     */
-    @Override
-    public Pedido salvar(Pedido pedido) {
-        log.info("Iniciando criação de novo pedido");
-        
-        try {
-            pedidoValidator.validarPedido(pedido);
-            configurarDadosIniciais(pedido);
-            pedidoCalculator.prepararPedido(pedido);
-        } catch (RuntimeException e) {
-            throw new BusinessException(e.getMessage());
-        }
-        
-        Pedido pedidoSalvo = pedidoRepository.save(pedido);
-        
-        log.info("Pedido criado com sucesso - ID: {}, Valor Total: {}", 
-                pedidoSalvo.getId(), pedidoSalvo.getValorTotal());
-        
-        return pedidoSalvo;
     }
     
     /**
      * Atualiza um pedido existente a partir de DTO
      */
+    @Override
     public Pedido atualizar(Long id, PedidoDTO pedidoDTO) {
-        if (!pedidoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Pedido não encontrado com ID: " + id);
+        log.info("Iniciando atualização do pedido ID: {}", id);
+        
+        Pedido pedidoExistente = pedidoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado com ID: " + id));
+
+        clienteRepository.findById(pedidoDTO.getClienteId())
+            .ifPresentOrElse(
+                pedidoExistente::setCliente,
+                () -> { throw new BusinessException("Cliente não encontrado com ID: " + pedidoDTO.getClienteId()); }
+            );
+
+        pedidoExistente.setStatus(pedidoDTO.getStatus());
+        pedidoExistente.setTipoPagamento(pedidoDTO.getTipoPagamento());
+
+        Map<Long, ItemPedido> itensExistentesMap = pedidoExistente.getItens().stream()
+                .collect(Collectors.toMap(item -> item.getProduto().getId(), item -> item));
+
+        Set<Long> produtoIdsDoDto = pedidoDTO.getItens().stream()
+                .map(PedidoDTO.ItemPedidoDTO::getProdutoId)
+                .collect(Collectors.toSet());
+
+        pedidoExistente.getItens().removeIf(item -> !produtoIdsDoDto.contains(item.getProduto().getId()));
+
+        pedidoDTO.getItens().forEach(itemDTO -> {
+            Long produtoId = itemDTO.getProdutoId();
+            ItemPedido itemExistente = itensExistentesMap.get(produtoId);
+
+            if (itemExistente != null) {
+                log.debug("Atualizando item para o produto ID: {}. Nova quantidade: {}", produtoId, itemDTO.getQuantidade());
+                itemExistente.setQuantidade(itemDTO.getQuantidade());
+            } else {
+                log.debug("Adicionando novo item para o produto ID: {}", produtoId);
+                Produto produto = produtoRepository.findById(produtoId)
+                        .orElseThrow(() -> new BusinessException("Produto não encontrado com ID: " + produtoId));
+                
+                ItemPedido novoItem = new ItemPedido();
+                novoItem.setProduto(produto);
+                novoItem.setQuantidade(itemDTO.getQuantidade());
+                novoItem.setPedido(pedidoExistente);
+                
+                pedidoExistente.getItens().add(novoItem);
+            }
+        });
+
+        try {
+            pedidoValidator.validarPedido(pedidoExistente);
+            pedidoCalculator.prepararPedido(pedidoExistente);
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
         }
-        
-        Pedido pedido = modelMapper.map(pedidoDTO, Pedido.class);
-        pedido.setId(id);
-        
-        return pedidoRepository.save(pedido);
+
+        Pedido pedidoAtualizado = pedidoRepository.save(pedidoExistente);
+
+        log.info("Pedido ID: {} atualizado com sucesso. Novo valor total: {}",
+                pedidoAtualizado.getId(), pedidoAtualizado.getValorTotal());
+
+        return pedidoAtualizado;
     }
     
     /**
@@ -140,18 +212,6 @@ public class PedidoServiceImpl implements IPedidoService {
         
         log.debug("Dados iniciais configurados - Data: {}, Status: {}", 
                  pedido.getDataPedido(), pedido.getStatus());
-    }
-    
-    /**
-     * Atualiza um pedido existente (método original)
-     */
-    @Override
-    public Pedido atualizar(Long id, Pedido pedido) {
-        if (!pedidoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Pedido não encontrado com ID: " + id);
-        }
-        pedido.setId(id);
-        return pedidoRepository.save(pedido);
     }
     
     /**
@@ -188,13 +248,22 @@ public class PedidoServiceImpl implements IPedidoService {
     /**
      * Calcula o valor total de um pedido
      */
-    @Override
-    public Double calcularValorTotal(Pedido pedido) {
+    private Double calcularValorTotal(Pedido pedido) {
         if (pedido == null) {
             throw new BusinessException("Pedido não pode ser nulo para calcular o valor total.");
         }
         
         BigDecimal valorTotal = pedidoCalculator.calcularValorTotal(pedido);
         return valorTotal.doubleValue();
+    }
+
+    /**
+     * Calcula o valor total de um pedido por ID.
+     */
+    @Override
+    public Double calcularValorTotal(Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado com ID: " + pedidoId));
+        return calcularValorTotal(pedido);
     }
 } 

@@ -3,7 +3,7 @@ package com.br.bootcamp.orders.controller;
 import com.br.bootcamp.orders.model.Produto;
 import com.br.bootcamp.orders.model.dto.ErrorResponseDTO;
 import com.br.bootcamp.orders.model.dto.ProdutoDTO;
-import com.br.bootcamp.orders.service.ProdutoServiceImpl;
+import com.br.bootcamp.orders.service.contracts.IProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,14 +29,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/produtos")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Tag(name = "Produtos", description = "Endpoints para gerenciamento de produtos")
 public class ProdutoController {
-    private final ProdutoServiceImpl produtoService;
 
-    public ProdutoController(ProdutoServiceImpl produtoService) {
-        this.produtoService = produtoService;
-    }
+    private final IProdutoService produtoService;
     
     /**
      * GET /api/produtos - Lista todos os produtos

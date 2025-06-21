@@ -24,7 +24,7 @@ public class OpenApiConfig {
                         .contact(new Contact()
                                 .name("Bootcamp Architecture Software")
                                 .email("contato@bootcamp.com")
-                                .url("https://github.com/bootcamp/orders"))
+                                .url("https://github.com/iagobrdev/orders-bootcamp"))
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))

@@ -1,6 +1,7 @@
 package com.br.bootcamp.orders.service.contracts;
 
 import com.br.bootcamp.orders.model.Cliente;
+import com.br.bootcamp.orders.model.dto.ClienteDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -90,7 +91,7 @@ public interface IClienteService {
      * @throws IllegalArgumentException se o cliente for null
      * @throws RuntimeException se o email já existir no sistema ou houver erro na persistência
      */
-    Cliente salvar(Cliente cliente);
+    Cliente salvar(ClienteDTO cliente);
     
     /**
      * Atualiza os dados de um cliente existente.
@@ -105,7 +106,7 @@ public interface IClienteService {
      * @throws IllegalArgumentException se o ID for null ou o cliente for null
      * @throws RuntimeException se o cliente não existir ou houver erro na atualização
      */
-    Cliente atualizar(Long id, Cliente cliente);
+    Cliente atualizar(Long id, ClienteDTO cliente);
     
     /**
      * Remove um cliente do sistema.

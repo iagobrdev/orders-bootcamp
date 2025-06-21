@@ -1,11 +1,11 @@
 package com.br.bootcamp.orders.service;
 
-import com.br.bootcamp.orders.service.exception.BusinessException;
-import com.br.bootcamp.orders.service.exception.ResourceNotFoundException;
 import com.br.bootcamp.orders.model.Produto;
 import com.br.bootcamp.orders.model.dto.ProdutoDTO;
 import com.br.bootcamp.orders.repository.ProdutoRepository;
 import com.br.bootcamp.orders.service.contracts.IProdutoService;
+import com.br.bootcamp.orders.service.exception.BusinessException;
+import com.br.bootcamp.orders.service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -68,6 +68,7 @@ public class ProdutoServiceImpl implements IProdutoService {
     /**
      * Salva um novo produto a partir de DTO
      */
+    @Override
     public Produto salvar(ProdutoDTO produtoDTO) {
         Produto produto = modelMapper.map(produtoDTO, Produto.class);
         validarProduto(produto);
@@ -77,37 +78,14 @@ public class ProdutoServiceImpl implements IProdutoService {
     }
     
     /**
-     * Salva um novo produto (método original)
-     */
-    @Override
-    public Produto salvar(Produto produto) {
-        validarProduto(produto);
-        Produto produtoSalvo = produtoRepository.save(produto);
-        log.info("Produto criado com sucesso - ID: {}, Nome: {}", produtoSalvo.getId(), produtoSalvo.getNome());
-        return produtoSalvo;
-    }
-    
-    /**
      * Atualiza um produto existente a partir de DTO
      */
+    @Override
     public Produto atualizar(Long id, ProdutoDTO produtoDTO) {
         if (!produtoRepository.existsById(id)) {
             throw new ResourceNotFoundException("Produto não encontrado com ID: " + id);
         }
         Produto produto = modelMapper.map(produtoDTO, Produto.class);
-        produto.setId(id);
-        validarProduto(produto);
-        return produtoRepository.save(produto);
-    }
-    
-    /**
-     * Atualiza um produto existente (método original)
-     */
-    @Override
-    public Produto atualizar(Long id, Produto produto) {
-        if (!produtoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Produto não encontrado com ID: " + id);
-        }
         produto.setId(id);
         validarProduto(produto);
         return produtoRepository.save(produto);

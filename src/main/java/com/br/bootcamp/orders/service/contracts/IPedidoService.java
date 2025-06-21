@@ -1,9 +1,10 @@
 package com.br.bootcamp.orders.service.contracts;
 
-import com.br.bootcamp.orders.model.enums.StatusPedido;
 import com.br.bootcamp.orders.model.Pedido;
+import com.br.bootcamp.orders.model.dto.PedidoDTO;
+import com.br.bootcamp.orders.model.enums.StatusPedido;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,20 +68,6 @@ public interface IPedidoService {
     List<Pedido> buscarPorCliente(Long clienteId);
     
     /**
-     * Busca pedidos dentro de um período específico.
-     * 
-     * <p>Este método retorna todos os pedidos criados entre as datas especificadas,
-     * inclusive. As datas devem estar no formato LocalDateTime.</p>
-     * 
-     * @param dataInicio Data de início do período (inclusive)
-     * @param dataFim Data de fim do período (inclusive)
-     * @return Lista de pedidos no período especificado
-     * @throws IllegalArgumentException se as datas forem null ou se a data de início for posterior à data de fim
-     * @throws RuntimeException se houver erro na consulta ao banco de dados
-     */
-    List<Pedido> buscarPorPeriodo(LocalDateTime dataInicio, LocalDateTime dataFim);
-    
-    /**
      * Busca pedidos por status específico.
      * 
      * <p>Este método retorna todos os pedidos que possuem o status especificado,
@@ -92,6 +79,33 @@ public interface IPedidoService {
      * @throws RuntimeException se houver erro na consulta ao banco de dados
      */
     List<Pedido> buscarPorStatus(StatusPedido status);
+    
+    /**
+     * Busca pedidos dentro de um período específico.
+     * 
+     * <p>Este método retorna todos os pedidos criados entre as datas especificadas,
+     * inclusive. As datas devem estar no formato LocalDateTime.</p>
+     * 
+     * @param dataInicio Data de início do período (inclusive)
+     * @param dataFim Data de fim do período (inclusive)
+     * @return Lista de pedidos no período especificado
+     * @throws IllegalArgumentException se as datas forem null ou se a data de início for posterior à data de fim
+     * @throws RuntimeException se houver erro na consulta ao banco de dados
+     */
+    List<Pedido> buscarPorPeriodo(LocalDate dataInicio, LocalDate dataFim);
+    
+    /**
+     * Busca pedidos por data específica.
+     * 
+     * <p>Este método retorna todos os pedidos criados em uma data específica,
+     * inclusive. A data deve estar no formato LocalDateTime.</p>
+     * 
+     * @param data Data específica para busca de pedidos
+     * @return Lista de pedidos criados na data especificada
+     * @throws IllegalArgumentException se a data for null
+     * @throws RuntimeException se houver erro na consulta ao banco de dados
+     */
+    List<Pedido> buscarPorData(LocalDate data);
     
     /**
      * Salva um novo pedido no sistema.
@@ -111,7 +125,7 @@ public interface IPedidoService {
      * @throws IllegalArgumentException se o pedido for null ou dados inválidos
      * @throws RuntimeException se cliente/produtos não existirem, estoque insuficiente ou erro na persistência
      */
-    Pedido salvar(Pedido pedido);
+    Pedido salvar(PedidoDTO pedido);
     
     /**
      * Atualiza os dados de um pedido existente.
@@ -126,7 +140,7 @@ public interface IPedidoService {
      * @throws IllegalArgumentException se o ID for null ou o pedido for null
      * @throws RuntimeException se o pedido não existir ou houver erro na atualização
      */
-    Pedido atualizar(Long id, Pedido pedido);
+    Pedido atualizar(Long id, PedidoDTO pedido);
     
     /**
      * Remove um pedido do sistema.
@@ -168,16 +182,16 @@ public interface IPedidoService {
     Pedido atualizarStatus(Long id, StatusPedido novoStatus);
     
     /**
-     * Calcula o valor total de um pedido.
+     * Calcula o valor total de um pedido usando seu ID.
      * 
      * <p>Este método calcula automaticamente o valor total de um pedido baseado
      * nos itens e suas quantidades. O cálculo considera preços unitários e
      * quantidades de cada item.</p>
      * 
-     * @param pedido Pedido para cálculo do valor total
+     * @param pedidoId ID do pedido para cálculo do valor total
      * @return Valor total calculado do pedido
-     * @throws IllegalArgumentException se o pedido for null
+     * @throws IllegalArgumentException se o pedidoId for null ou negativo
      * @throws RuntimeException se houver erro no cálculo
      */
-    Double calcularValorTotal(Pedido pedido);
+    Double calcularValorTotal(Long pedidoId);
 } 
