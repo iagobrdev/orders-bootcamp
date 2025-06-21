@@ -195,25 +195,32 @@ graph TD
     
     api("API REST<br>[Container]")
 
-    subgraph "Camada de Controladores (Controllers)"
+    subgraph "Camada de Controllers"
         direction LR
         cc("ClienteController<br>[Componente]")
         pc("ProdutoController<br>[Componente]")
         oc("PedidoController<br>[Componente]")
     end
 
-    subgraph "Camada de Interfaces (Contracts)"
+    subgraph "Camada de Interfaces"
         direction LR
         ics("IClienteService<br>[Interface]")
         ips("IProdutoService<br>[Interface]")
         ios("IPedidoService<br>[Interface]")
     end
 
-    subgraph "Camada de Serviços (Services)"
+    subgraph "Camada de Services"
         direction LR
-        cs("ClienteServiceImpl<br>[Componente]")
-        ps("ProdutoServiceImpl<br>[Componente]")
-        os("PedidoServiceImpl<br>[Componente]")
+        cs("ClienteServiceImpl<br>[Service]")
+        ps("ProdutoServiceImpl<br>[Service]")
+        os("PedidoServiceImpl<br>[Service]")
+    end
+
+    subgraph "Camada de Repositories"
+        direction LR
+        cr("ClienteRepository<br>[Repository]")
+        pr("ProdutoRepository<br>[Repository]")
+        or("PedidoRepository<br>[Repository]")
     end
 
     db("Banco de Dados<br>[Container: PostgreSQL]")
@@ -228,9 +235,13 @@ graph TD
     ips -- "É implementada por" --> ps
     ios -- "É implementada por" --> os
 
-    cs -- "Acessa" --> db
-    ps -- "Acessa" --> db
-    os -- "Acessa" --> db
+    cs -- "Usa" --> cr
+    ps -- "Usa" --> pr
+    os -- "Usa" --> or
+
+    cr -- "Acessa" --> db
+    pr -- "Acessa" --> db
+    or -- "Acessa" --> db
 ```
 
 ### C4 Model Nível 4: Pacotes, Classes e Sequência
