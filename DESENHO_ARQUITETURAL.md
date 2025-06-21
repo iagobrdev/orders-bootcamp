@@ -336,11 +336,12 @@ classDiagram
         +criar(dto) : ResponseEntity
     }
 
-    class IPedidoService
+    class IPedidoService {
+        +listarTodos() : List~Pedido~
+        +buscarPorId(id) : Optional~Pedido~
+        +salvar(dto) : Pedido
+    }
     <<Interface>> IPedidoService
-    IPedidoService : +listarTodos() : List~Pedido~
-    IPedidoService : +buscarPorId(id) : Optional~Pedido~
-    IPedidoService : +salvar(dto) : Pedido
 
     class PedidoServiceImpl {
         -PedidoRepository pedidoRepository
@@ -348,7 +349,9 @@ classDiagram
         -ProdutoRepository produtoRepository
     }
     
-    class PedidoRepository
+    class PedidoRepository {
+        % Nenhum método para simplificar
+    }
     <<Interface>> PedidoRepository
     
     class Pedido {
